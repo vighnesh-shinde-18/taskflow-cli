@@ -3,7 +3,6 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js'
 
 const isAssignedDeveloper = asyncHandler(async (req, res, next) => {
-    try {
         const taskId = req.params.taskId || req.body.taskId;
         const developerId = req.user.id;
 
@@ -16,12 +15,37 @@ const isAssignedDeveloper = asyncHandler(async (req, res, next) => {
             throw new ApiError(403,'Task not assigned to you')
         }
 
-        next();
-    } catch (error) {
-        console.log("Error while checking assigned task user ", error)
-        throw new ApiError(503, "Internel Server error", error);
-    }
-
+        next(); 
+    
 });
 
-export  {isAssignedDeveloper};
+const ownTask = asyncHandler(async (req, res, next) => {
+    const { taskId } = req.params;
+    const managerId = req.user.id;
+
+    if (!taskId) {
+      throw new ApiError(400, 'Task ID is required');
+    }
+
+    const [rows] = await db.execute(
+      `
+      SELECT t.id
+      FROM tasks t
+      JOIN projects p ON t.project_id = p.id
+      WHERE t.id = ? AND p.manager_id = ?
+      `,
+      [taskId, managerId]
+    );
+
+    if (!rows.length) {
+      throw new ApiError(
+        403,
+        'You are not authorized to complete this task'
+      );
+    }
+
+    // ownership confirmed
+    next(); 
+});
+
+export  {isAssignedDeveloper, ownTask};

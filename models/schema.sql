@@ -51,11 +51,15 @@ CREATE TABLE deployments (
   id INT AUTO_INCREMENT PRIMARY KEY,
   project_id INT,
   manager_id INT,
+  deployment_version VARCHAR(50) NOT NULL,
   deployed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  status ENUM('IN_PROGRESS' ,'SUCCESS', 'FAILED') DEFAULT 'SUCCESS',
+  status ENUM('IN_PROGRESS' ,'DEPLOYED', 'FAILED') DEFAULT 'IN_PROGRESS',
   FOREIGN KEY (project_id) REFERENCES projects(id),
   FOREIGN KEY (manager_id) REFERENCES users(id)
 );
+
+ 
+
 
 -- MESSAGES
 CREATE TABLE messages (
@@ -72,13 +76,17 @@ CREATE TABLE teams (
   id INT AUTO_INCREMENT PRIMARY KEY,
   manager_id INT NOT NULL,
   name VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (manager_id) REFERENCES users(id)
 );
 
 CREATE TABLE team_members (
   team_id INT,
   developer_id INT,
+  joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (team_id, developer_id),
   FOREIGN KEY (team_id) REFERENCES teams(id),
   FOREIGN KEY (developer_id) REFERENCES users(id)
 );
+
+ 

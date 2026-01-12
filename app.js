@@ -6,6 +6,8 @@ import cors from 'cors'
 import db from './db/index.js'
 import projectRoutes from './routes/Projects.Routes.js'
 import taskRoutes from './routes/Task.Routes.js'
+import prRoutes from './routes/Pr.Routes.js'
+import deploymentRoutes from './routes/Deployment.Routes.js'
 
 const app = express();
 
@@ -19,5 +21,7 @@ app.get('/health', (req, res) => {
 app.use("/api/v1/auth",authRoutes)
 app.use("/api/v1/project",projectRoutes)
 app.use("/api/v1/task",taskRoutes)
- 
+app.use("/api/v1/pr",prRoutes)
+app.use('/api/v1/deployments', deploymentRoutes); 
+
 export default app;

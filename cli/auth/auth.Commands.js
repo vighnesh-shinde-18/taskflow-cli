@@ -1,34 +1,37 @@
-import axios from 'axios';
-import { saveToken } from './tokenStore.js'
+ 
+import { saveToken } from '../token/tokenStore.js'
+import client from '../client.js';
+import handleCliError from '../utils/handleError.js'
 
-const API = 'http://localhost:5000/api/v1/auth';
 
-const register = async (email, name, password, role) => {
+const register = async (email, name, password, role, teamId) => {
     try {
-        const response = await axios.post(`${API}/register`, {
-            email,
-            password,
-            name,
-            role
-        });
+        const payload = { email, password, name, role };
+
+        if (role === 'DEVELOPER') {
+            payload.teamId = teamId;
+        }
+
+        const response = await client.post('/auth/register', payload);
 
         console.log('✅ Regsiter successful');
-    } catch (err) {
-        console.error('❌ Register failed');
+    } catch (error) { 
+        handleCliError(error, `Register failed`);
     }
 };
 
 
 const login = async (email, password) => {
     try {
-        const response = await axios.post(`${API}/auth/login`, {
+        const response = await client.post(`/auth/login`, {
             email,
             password
-        }); 
+        });
         saveToken(response.data.data);
         console.log('✅ Login successful');
-    } catch (err) {
-        console.error('❌ Login failed');
+    } catch (error) {
+        handleCliError(error, `Login failed`);
+
     }
 };
 

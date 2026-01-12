@@ -3,7 +3,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js'
 
 const isDeveloperInManagerTeam = asyncHandler(async (req, res, next) => {
-    try {
+    
         const managerId = req.user.id;
         const developerId = req.body.developerId;
 
@@ -29,12 +29,7 @@ const isDeveloperInManagerTeam = asyncHandler(async (req, res, next) => {
         }
 
         next();
-
-    } catch (error) {
-        console.log("Error while checking developer in the team ", error)
-        throw new ApiError(503, "Internel Server error", error);
-
-    }
+ 
 });
 
 export default isDeveloperInManagerTeam;

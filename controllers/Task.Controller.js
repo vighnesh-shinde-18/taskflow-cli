@@ -3,30 +3,32 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 
 const fetchTask = asyncHandler(async (req, res) => {
-    try {
-        const { projectId } = req.params;
+     
+        if (req.user.role === 'MANAGER') {
+            const { projectId } = req.params;
 
-        if ([projectId].some((field) => !field)) {
-            throw new ApiError(401, "Project Id is required");
+            const [tasks] = await db.execute(
+                'SELECT * FROM tasks WHERE project_id = ?',
+                [projectId]
+            );
+
+            return res.json(tasks);
         }
 
-        const [result] = await db.execute(
-            'SELECT * FROM tasks WHERE project_id = ?',
-            [title, description, projectId]
+        // Developer
+        const developerId = req.user.id;
+
+        const [tasks] = await db.execute(
+            'SELECT * FROM tasks WHERE assigned_to = ?',
+            [developerId]
         );
 
-        res.status(201).json({
-            message: 'Task created',
-            data: result,
-            success: true
-        });
-    } catch (error) {
-        console.log("Error while fetching task")
-        throw new ApiError(503, "Internel Server error", error);
-    }
+        res.json(tasks);
+
+     
 })
 const createTask = asyncHandler(async (req, res) => {
-    try {
+  
         const { title, description, projectId } = req.body;
 
         if ([title, description, projectId].some((field) => !field)) {
@@ -43,18 +45,14 @@ const createTask = asyncHandler(async (req, res) => {
             data: { taskId: result.insertId },
             success: true
         });
-    } catch (error) {
-        console.log("Error while creating task")
-        throw new ApiError(503, "Internel Server error", error);
-
-    }
+     
 
 });
 
 
 
 const assignTask = asyncHandler(async (req, res) => {
-    try {
+     
         const { taskId, developerId } = req.body;
 
         if ([taskId, developerId].some((field) => !field)) {
@@ -71,34 +69,49 @@ const assignTask = asyncHandler(async (req, res) => {
             data: result,
             success: true
         });
-    } catch (error) {
-        console.log("Error while assigning task")
-        throw new ApiError(503, "Internel Server error", error);
-    }
+    
 });
 
 const updateTaskStatus = asyncHandler(async (req, res) => {
-    try {
-        const { taskId, status } = req.body;
+ 
+        const { taskId } = req.body;
 
-        if ([taskId, status].some((field) => !field)) {
+        if ([taskId].some((field) => !field)) {
             throw new ApiError(401, "All fields are required");
         }
 
         const [result] = await db.execute(
-            'UPDATE tasks SET status = ? WHERE id = ?',
-            [status, taskId]
+            'UPDATE tasks SET status = "IN_PROGRESS" WHERE id = ?',
+            [taskId]
         );
 
+        
+
         res.status(201).json({
-            message: 'Task status updated successfully',
+            message: 'Task status update to in progress successfully',
             data: result,
             success: true
         });
-    } catch (error) {
-        console.log("Error while assigning task")
-        throw new ApiError(503, "Internel Server error", error);
-    }
+ 
 });
 
-export { createTask, assignTask, updateTaskStatus, fetchTask }
+const completeTask = asyncHandler(async (req, res) => {
+   
+        const { taskId } = req.params;
+
+        await db.execute(
+            `UPDATE tasks SET status = 'DONE' WHERE id = ?`,
+            [taskId]
+        );
+
+        res.json({
+            message: 'Task marked as DONE (system-driven)'
+        });
+    
+});
+
+
+
+
+
+export { createTask, assignTask, updateTaskStatus, fetchTask, completeTask }

@@ -3,7 +3,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 
 const createProject = asyncHandler(async (req, res) => {
-    try {
+    
 
         const { name, description } = req.body;
         const managerId = req.user.id;
@@ -22,15 +22,11 @@ const createProject = asyncHandler(async (req, res) => {
             data: result.insertId,
             success: true
         });
-    } catch (error) {
-        console.log("Error while creating project")
-        throw new ApiError(503, "Internel Server error", error);
-    }
+   
 });
 
 const getMyProjects = asyncHandler(async (req, res) => {
-    try {
-
+    
         const managerId = req.user.id;
 
         const [projects] = await db.execute(
@@ -44,16 +40,14 @@ const getMyProjects = asyncHandler(async (req, res) => {
             data: projects,
             success: true
         });
-    } catch (error) {
-        console.log("Error while fetching project")
-        throw new ApiError(503, "Internel Server error", error);
-    }
+  
 });
 
 const completeProject = asyncHandler(async (req, res) => {
-    try {
+ 
         const { projectId } = req.params;
         const managerId = req.user.id;
+
 
         const [projects] = await db.execute(
             'SELECT id, status FROM projects WHERE id = ? AND manager_id = ?',
@@ -76,10 +70,7 @@ const completeProject = asyncHandler(async (req, res) => {
         );
 
         if (pendingTasks.length > 0) {
-            throw new ApiError(
-                400,
-                'Cannot complete project. All tasks must be DONE.'
-            );
+            throw new ApiError(400, 'Cannot complete project. All tasks must be DONE.');
         }
 
         // 3️⃣ Mark project as COMPLETED
@@ -90,14 +81,11 @@ const completeProject = asyncHandler(async (req, res) => {
 
         res.json({
             success: true,
-            message: 'Project marked as COMPLETED successfully',
+            message: 'Project COMPLETED successfully',
             data: projects[0]
         });
 
-    } catch (error) {
-        console.log('Error while completing the project');
-        throw new ApiError(503, 'Internal Server Error', error);
-    }
+  
 })
 
-export { createProject, getMyProjects , completeProject}
+export { createProject, getMyProjects, completeProject }

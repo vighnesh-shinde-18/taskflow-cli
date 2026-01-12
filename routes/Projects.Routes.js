@@ -20,8 +20,8 @@ router.get(
     getMyProjects
 );
 
-router.post(
-    '/complete',
+router.patch(
+    '/complete/:projectId',
     authenticationMiddleware,
     isManager,
     ownsProject,
