@@ -1,4 +1,4 @@
-# CLI-Based Project & Task Management System 🚀
+# TaskFlow CLI – Workflow-Driven Project Management System 🚀
 
 A **backend-focused, workflow-driven project management system** inspired by Jira and GitHub, built completely from scratch using **Node.js, Express, MySQL, and a custom CLI**.
 
@@ -55,6 +55,25 @@ This project demonstrates **real-world backend engineering concepts** such as au
 
 ---
 
+## 🏗 Architecture Overview
+
+The system follows a layered backend architecture:
+
+CLI (Commander.js)
+      ↓
+Express API Layer
+      ↓
+Authentication & Authorization Middleware
+      ↓
+Business Logic Controllers
+      ↓
+Raw SQL Queries (mysql2)
+      ↓
+MySQL Database
+
+All validation and workflow enforcement are handled server-side.
+The CLI acts strictly as a thin client.
+
 ## 🧠 System Roles
 
 ### 👔 Manager
@@ -74,6 +93,7 @@ This project demonstrates **real-world backend engineering concepts** such as au
 ## 🔁 Workflow Overview
 
 ### 📋 Task Lifecycle
+The system enforces strict state-machine transitions. All task and PR status updates are validated against predefined workflow rules to prevent illegal state changes.
 
 **TODO → IN_PROGRESS → (PR Raised) → IN_REVIEW → DONE**
 
@@ -115,6 +135,7 @@ This project demonstrates **real-world backend engineering concepts** such as au
 - `tasks` – Assigned to developers
 - `pull_requests` – PR lifecycle
 - `deployments` – Deployment history
+Foreign key constraints and relational integrity are enforced at database level to prevent orphan records and invalid references.
 
 ---
 
@@ -256,4 +277,4 @@ pm project:deploy --projectId 1 --deployVersion v1.2.0
 **Vighnesh Shinde**
 
 ### 📌 Final Note
-This project was intentionally built without ORMs or frontend frameworks to focus on core backend engineering skills.
+This project was intentionally built without ORMs or frontend frameworks to focus on core backend engineering skills, SQL transparency, and workflow validation logic.
